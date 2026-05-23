@@ -1,0 +1,129 @@
+// ===== 1. Billable.java (Interface) =====
+interface Billable {
+  double calculateBill();
+  String getBillSummary();
+}
+
+// ===== 2. HospitalStaff.java (Abstract class) =====
+abstract class HospitalStaff {
+  private int id;         // encapsulation
+  private String name;
+  private double salary;
+
+  public HospitalStaff(int id, String name, double salary) {
+    this.id = id; this.name = name; this.salary = salary;
+  }
+
+  public int getId()         { return id; }
+  public String getName()   { return name; }
+  public double getSalary() { return salary; }
+
+  public String getDetails() {
+    return "[ID:" + id + "] " + name;
+  }
+
+  public abstract void work();          // abstraction
+  public abstract String generateReport();
+}
+
+// ===== 3. Doctor.java =====
+class Doctor extends HospitalStaff {  // inheritance
+  private String specialization;
+
+  public Doctor(int id, String name,
+                double salary, String spec) {
+    super(id, name, salary);
+    this.specialization = spec;
+  }
+
+  @Override
+  public void work() {                  // polymorphism
+    System.out.println(getName() +
+      " [Doctor] is diagnosing patients");
+  }
+
+  @Override
+  public String generateReport() {
+    return getDetails() + " | Spec: " + specialization;
+  }
+
+  public void prescribe(String med) {
+    System.out.println(getName() + " prescribes: " + med);
+  }
+}
+
+// ===== 4. Nurse.java =====
+class Nurse extends HospitalStaff {   // inheritance
+  private String ward;
+
+  public Nurse(int id, String name,
+               double salary, String ward) {
+    super(id, name, salary);
+    this.ward = ward;
+  }
+
+  @Override
+  public void work() {                  // polymorphism
+    System.out.println(getName() +
+      " [Nurse] is administering medicine");
+  }
+
+  @Override
+  public String generateReport() {
+    return getDetails() + " | Ward: " + ward;
+  }
+}
+
+// ===== 5. Patient.java =====
+class Patient implements Billable {   // interface
+  private String name;
+  private int daysAdmitted;
+  private String roomType;
+
+  public Patient(String name, int days, String room) {
+    this.name = name;
+    this.daysAdmitted = days;
+    this.roomType = room;
+  }
+
+  @Override
+  public double calculateBill() {
+    double rate = roomType.equals("ICU") ? 4000 : 1500;
+    return daysAdmitted * rate;
+  }
+
+  @Override
+  public String getBillSummary() {
+    return "Patient: " + name + " | Room: " + roomType
+         + " | Days: " + daysAdmitted
+         + " | Bill: ₹" + calculateBill();
+  }
+}
+
+// ===== 6. Main.java =====
+public class Main {
+  public static void main(String[] args) {
+
+    // Polymorphic array of staff
+    HospitalStaff[] staff = {
+      new Doctor(1, "Dr. Arjun", 80000, "Cardiology"),
+      new Nurse(2, "Priya", 40000, "ICU"),
+      new Doctor(3, "Dr. Meena", 90000, "Neurology")
+    };
+
+    System.out.println("=== Morning Shift ===");
+    for (HospitalStaff s : staff) {
+      s.work();                        // polymorphism!
+      System.out.println(s.generateReport());
+    }
+
+    // Patient billing
+    System.out.println("\n=== Billing ===");
+    Patient[] patients = {
+      new Patient("Ravi", 5, "ICU"),
+      new Patient("Anjali", 3, "General")
+    };
+    for (Patient p : patients)
+      System.out.println(p.getBillSummary());
+  }
+}
